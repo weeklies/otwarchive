@@ -48,6 +48,7 @@ Otwarchive::Application.configure do
   config.action_controller.default_url_options = { host: "http://www.example.com", port: nil }
   config.action_mailer.default_url_options = config.action_controller.default_url_options
 
+  # Testing
   config.after_initialize do
     Bullet.enable = true
     Bullet.bullet_logger = true

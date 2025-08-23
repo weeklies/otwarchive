@@ -74,5 +74,10 @@ Capybara::Screenshot.register_driver :selenium_chrome_headless do |driver, path|
   driver.browser.save_screenshot(path)
 end
 
+# Testing if delete comment features fail
+Capybara.register_driver :rack_test do |app|
+  Capybara::RackTest::Driver.new(app, respect_data_method: false)
+end 
+
 Capybara.default_driver = :rack_test
 Capybara.javascript_driver = :selenium_chrome_headless

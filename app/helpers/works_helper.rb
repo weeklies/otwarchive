@@ -4,7 +4,10 @@ module WorksHelper
   def work_meta_list(work, chapter = nil)
     # if we're previewing, grab the unsaved date, else take the saved first chapter date
     published_date = (chapter && work.preview_mode) ? chapter.published_at : work.first_chapter.published_at
-    list = [[ts("Published:"), "published", localize(published_date)],
+    list = [["work posted_at:", "posted_at", work.posted_at],
+            ["chapter posted_at:", "posted_at", chapter&.posted_at],
+            ["work changed_at", "changed_at", work.changed_at],
+            [ts("Published:"), "published", localize(published_date)],
             [ts("Words:"), "words", number_with_delimiter(work.word_count)],
             [ts("Chapters:"), "chapters", chapter_total_display(work)]]
 
@@ -24,7 +27,7 @@ module WorksHelper
     if work.chaptered? && work.revised_at
       prefix = work.is_wip ? ts('Updated:') : ts('Completed:')
       latest_date = (work.preview_mode && work.backdate) ? published_date : date_in_user_time_zone(work.revised_at).to_date
-      list.insert(1, [prefix, 'status', localize(latest_date)])
+      list.insert(3, [prefix, 'status', localize(latest_date)])
     end
     list = list.map { |list_item| content_tag(:dt, list_item.first, class: list_item.second) + content_tag(:dd, list_item.last.to_s, class: list_item.second) }.join.html_safe
     content_tag(:dl, list.to_s, class: 'stats').html_safe

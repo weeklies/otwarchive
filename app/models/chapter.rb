@@ -21,7 +21,6 @@ class Chapter < ApplicationRecord
   validates_length_of :endnotes, allow_blank: true, maximum: ArchiveConfig.NOTES_MAX,
     too_long: ts("must be less than %{max} characters long.", max: ArchiveConfig.NOTES_MAX)
 
-
   validates_presence_of :content
   validates_length_of :content, minimum: ArchiveConfig.CONTENT_MIN,
     too_short: ts("must be at least %{min} characters long.", min: ArchiveConfig.CONTENT_MIN)
@@ -78,10 +77,18 @@ class Chapter < ApplicationRecord
     end
   end
 
-  after_save :invalidate_chapter_count,
+  after_save :set_posted_at, :set_work_changed_at, :invalidate_chapter_count,
     if: Proc.new { |chapter| chapter.saved_change_to_posted? }
 
-  before_destroy :fix_positions_before_destroy, :invalidate_chapter_count
+  def set_posted_at
+    self.posted_at = Time.current
+  end
+
+  def set_work_changed_at
+    work&.set_changed_at(Time.current)
+  end
+
+  before_destroy :fix_positions_before_destroy, :invalidate_chapter_count, :set_work_changed_at
   def fix_positions_before_destroy
     if work&.persisted? && position
       chapters = work.chapters.where(["position > ?", position])

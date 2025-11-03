@@ -247,6 +247,8 @@ class Work < ApplicationRecord
   after_destroy :expire_caches, :update_pseud_and_collection_indexes
   after_save :notify_recipients, :expire_caches, :update_pseud_and_collection_indexes, :update_tag_index, :touch_series, :touch_related_works
 
+  before_save :set_posted_at, :set_changed_at
+
   before_destroy :send_deleted_work_notification, prepend: true
   def send_deleted_work_notification
     return unless self.posted? && users.present?
@@ -597,6 +599,18 @@ class Work < ApplicationRecord
   # VERSIONS & REVISION DATES
   ########################################################################
 
+  def set_posted_at
+    self.posted_at = Time.current if posted_changed?
+  end
+
+  def set_changed_at(date=nil)
+    return unless date ||
+      posted_changed? ||
+      in_unrevealed_collection_changed?
+
+    self.changed_at = date || Time.current
+  end
+
   def set_revised_at(date=nil)
     date ||= self.chapters.where(posted: true).maximum('published_at') ||
              self.revised_at || self.created_at || Time.current
@@ -718,6 +732,7 @@ class Work < ApplicationRecord
     return if chapter_one&.posted
 
     chapter_one.published_at = Date.current unless self.backdate
+    chapter_one.set_posted_at
     chapter_one.posted = true
     chapter_one.save
   end

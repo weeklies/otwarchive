@@ -600,7 +600,10 @@ class Work < ApplicationRecord
   ########################################################################
 
   def set_posted_at
-    self.posted_at = Time.current if posted_changed?
+    return unless posted_changed?
+
+    self.posted_at = Time.current
+    self.first_chapter.set_posted_at # to be tested
   end
 
   def set_changed_at(date=nil)
@@ -732,7 +735,6 @@ class Work < ApplicationRecord
     return if chapter_one&.posted
 
     chapter_one.published_at = Date.current unless self.backdate
-    chapter_one.set_posted_at
     chapter_one.posted = true
     chapter_one.save
   end

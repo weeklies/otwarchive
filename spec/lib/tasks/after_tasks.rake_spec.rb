@@ -877,6 +877,7 @@ describe "rake After:add_new_work_dates" do
       travel_to(date1)
       work = create(:work, posted_at: nil, changed_at: nil)
       work.update_columns(revised_at: date2, updated_at: date2)
+      work.first_chapter.update_columns(published_at: date1)
       work
     end
 
@@ -917,7 +918,7 @@ describe "rake After:add_new_chapter_date" do
 
     let(:old_chapter) do
       chapter = old_work.first_chapter
-      chapter.update_columns(updated_at: date2)
+      chapter.update_columns(updated_at: date2, published_at: date1)
       chapter
     end
 

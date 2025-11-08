@@ -37,7 +37,7 @@ class GiftsController < ApplicationController
       end
     end
     @works = @works.in_collection(@collection) if @collection
-    @works = @works.order('revised_at DESC').paginate(page: params[:page], per_page: ArchiveConfig.ITEMS_PER_PAGE)
+    @works = @works.order('changed_at DESC').paginate(page: params[:page], per_page: ArchiveConfig.ITEMS_PER_PAGE)
   end
 
   def toggle_rejected

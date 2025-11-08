@@ -31,19 +31,19 @@ class StatsController < ApplicationController
     params[:sort_direction] = @dir
 
     # gather works and sort by specified count
-    @years = ["All Years"] + user_chapters.pluck(:published_at).map { |date| date.year.to_s }
+    @years = ["All Years"] + user_chapters.pluck(:posted_at).map { |date| date.year.to_s }
       .uniq.sort
     @current_year = @years.include?(params[:year]) ? params[:year] : "All Years"
     if @current_year == "All Years"
-      work_query = work_query.select("works.revised_at as date, works.word_count as word_count")
+      work_query = work_query.select("works.changed_at as date, works.word_count as word_count")
     else
       next_year = @current_year.to_i + 1
       start_date = DateTime.parse("01/01/#{@current_year}")
       end_date = DateTime.parse("01/01/#{next_year}")
       work_query = work_query
         .joins(:chapters)
-        .where("chapters.posted = 1 AND chapters.published_at >= ? AND chapters.published_at < ?", start_date, end_date)
-        .select("CONVERT(MAX(chapters.published_at), datetime) as date, SUM(chapters.word_count) as word_count")
+        .where("chapters.posted = 1 AND chapters.posted_at >= ? AND chapters.posted_at < ?", start_date, end_date)
+        .select("CONVERT(MAX(chapters.posted_at), datetime) as date, SUM(chapters.word_count) as word_count")
         .group(:id, :fandom)
     end
     works = work_query.all.sort_by { |w| @dir == "ASC" ? (stat_element(w, @sort) || 0) : (0 - (stat_element(w, @sort) || 0).to_i) }

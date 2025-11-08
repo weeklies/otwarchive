@@ -98,7 +98,7 @@ namespace :search do
     Series.where("series.updated_at >  #{time}").select(:id).find_in_batches(batch_size: BATCH_SIZE) do |group|
       AsyncIndexer.new(BookmarkedSeriesIndexer, :world).enqueue_ids(group.map(&:id))
     end
-    Work.where("works.revised_at >  #{time}").select(:id).find_in_batches(batch_size: BATCH_SIZE) do |group|
+    Work.where("works.changed_at >  #{time}").select(:id).find_in_batches(batch_size: BATCH_SIZE) do |group|
       AsyncIndexer.new(BookmarkedWorkIndexer, :world).enqueue_ids(group.map(&:id))
     end
     Bookmark.where("bookmarks.updated_at >  #{time}").select(:id).find_in_batches(batch_size: BATCH_SIZE) do |group|
@@ -117,7 +117,7 @@ namespace :search do
   desc "Reindex recent works"
   task timed_works: :environment do
     time = ENV["TIME_PERIOD"] || "NOW() - INTERVAL 1 DAY"
-    Work.where("works.revised_at >  #{time}").select(:id).find_in_batches(batch_size: BATCH_SIZE) do |group|
+    Work.where("works.changed_at >  #{time}").select(:id).find_in_batches(batch_size: BATCH_SIZE) do |group|
       AsyncIndexer.new(WorkIndexer, :world).enqueue_ids(group.map(&:id))
     end
   end

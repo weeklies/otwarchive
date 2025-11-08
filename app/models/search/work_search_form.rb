@@ -10,7 +10,7 @@ class WorkSearchForm
     :creators,
     :collected,
     :faceted,
-    :revised_at,
+    :changed_at,
     :language_id,
     :complete,
     :crossover,

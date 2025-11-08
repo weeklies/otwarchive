@@ -217,6 +217,7 @@ class ChaptersController < ApplicationController
     was_draft = !@chapter.posted?
     if @chapter.destroy
       @work.minor_version = @work.minor_version + 1 unless was_draft
+      @work.set_changed_at(Time.current)
       @work.save
       flash[:notice] = ts("The chapter #{was_draft ? 'draft ' : ''}was successfully deleted.")
     else

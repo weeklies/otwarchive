@@ -2,14 +2,12 @@ module WorksHelper
 
   # List of date, chapter and length info for the work show page
   def work_meta_list(work, chapter = nil)
-    # if we're previewing, grab the unsaved date, else take the saved first chapter date
-    published_date = (chapter && work.preview_mode) ? chapter.published_at : work.first_chapter.published_at
-    list = [["work posted_at:", "posted_at", work.posted_at],
-            ["chapter posted_at:", "posted_at", chapter&.posted_at],
-            ["work changed_at:", "changed_at", work.changed_at],
-            [ts("Published:"), "published", localize(published_date)],
-            [ts("Words:"), "words", number_with_delimiter(work.word_count)],
-            [ts("Chapters:"), "chapters", chapter_total_display(work)]]
+    list = []
+    posted_date = (chapter && work.preview_mode) ? chapter.posted_at : work.posted_at
+
+    list << [ts("Published:"), "published", localize(posted_date.to_date)] if posted_date
+    list << [ts("Words:"), "words", number_with_delimiter(work.word_count)]
+    list << [ts("Chapters:"), "chapters", chapter_total_display(work)]
 
     if (comment_count = work.count_visible_comments) > 0
       list.concat([[ts("Comments:"), "comments", number_with_delimiter(work.count_visible_comments)]])
@@ -24,11 +22,11 @@ module WorksHelper
     end
     list.concat([[ts("Hits:"), "hits", number_with_delimiter(work.hits)]])
 
-    if work.chaptered? && work.revised_at
+    if work.chaptered? && work.changed_at
       prefix = work.is_wip ? ts('Updated:') : ts('Completed:')
-      latest_date = (work.preview_mode && work.backdate) ? published_date : date_in_user_time_zone(work.revised_at).to_date
-      list.insert(3, [prefix, 'status', localize(latest_date)])
+      list.insert(3, [prefix, 'status', localize(work.changed_at.to_date)])
     end
+
     list = list.map { |list_item| content_tag(:dt, list_item.first, class: list_item.second) + content_tag(:dd, list_item.last.to_s, class: list_item.second) }.join.html_safe
     content_tag(:dl, list.to_s, class: 'stats').html_safe
   end

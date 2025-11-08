@@ -638,7 +638,7 @@ namespace :After do
 
   desc "Backfill posted_at and changed_at for works"
   task(add_new_work_dates: :environment) do
-    work_count = Work.count
+    work_count = Work.posted.count
     total_batches = (work_count + 999) / 1000
     puts("Checking #{work_count} works in #{total_batches} batches") && STDOUT.flush
 
@@ -658,7 +658,7 @@ namespace :After do
 
   desc "Backfill posted_at for chapters"
   task(add_new_chapter_date: :environment) do
-    count = Chapter.count
+    count = Chapter.posted.count
     total_batches = (count + 999) / 1000
     puts("Checking #{count} chapters in #{total_batches} batches") && STDOUT.flush
 
@@ -666,6 +666,7 @@ namespace :After do
       batch_number = index + 1
 
       batch.each do |chapter|
+        next unless chapter.published_at
         chapter.update_column(:posted_at, chapter.published_at)
       end
       puts("Batch #{batch_number} of #{total_batches} complete") && STDOUT.flush

@@ -182,7 +182,6 @@ class Chapter < ApplicationRecord
   end
 
   def validate_posted_at
-    self.published_at = Date.current
     return unless self.posted_at
 
     # Do not change posted_at if only time was changed

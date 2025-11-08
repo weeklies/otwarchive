@@ -225,15 +225,26 @@
           <%= f.check_box :backdate, { id: "backdate-options-show", class: "toggle_formfield" } %>
         </dt>
         <dd class="backdate">
-          <%= label_tag "backdate-options-show", ts("Set a different publication date") %>
+          <%= label_tag "backdate-options-show", ts("Set different publication dates") %>
           <%= link_to_help "backdating-help" %>
 
           <fieldset id="backdate-options" class="optional">
             <dl>
-              <dt><%= label_tag "published_at", ts("Set publication date") %></dt>
+              <dt><%= label_tag "posted_at", ts("Work publication date") %></dt>
               <dd id="managePublicationDate" class="datetime" title="<%= ts("set date") %>">
-                <!--BACK END, this select box does not seem to be acquiring the label published_at -->
-                <%= c.date_select("published_at", :start_year => Date.current.year, :end_year => 1950, :default => Date.current, :value => @chapter.published_at, :order => [:day, :month, :year]) %>
+                <%= f.date_select :posted_at, start_year: Date.current.year, end_year: 1950, include_blank: true, value: @work.posted_at, order: [:day, :month, :year] %>
+              </dd>
+            </dl>
+            <dl>
+              <dt><%= label_tag "changed_at", ts("Work changed date") %></dt>
+              <dd id="TODO-managePublicationDate" class="datetime" title="<%= ts("set date") %>">
+                <%= f.date_select :changed_at, start_year: Date.current.year, end_year: 1950, include_blank: true, value: @work.changed_at, order: [:day, :month, :year] %>
+              </dd>
+            </dl>
+            <dl>
+              <dt><%= label_tag "posted_at", ts("Chapter publication date") %></dt>
+              <dd id="managePublicationDate" class="datetime" title="<%= ts("set date") %>">
+                <%= c.date_select :posted_at, start_year: Date.current.year, end_year: 1950, include_blank: true, value: @chapter.posted_at, order: [:day, :month, :year] %>
               </dd>
             </dl>
           </fieldset>

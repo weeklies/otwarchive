@@ -6,7 +6,7 @@ module WorksHelper
     published_date = (chapter && work.preview_mode) ? chapter.published_at : work.first_chapter.published_at
     list = [["work posted_at:", "posted_at", work.posted_at],
             ["chapter posted_at:", "posted_at", chapter&.posted_at],
-            ["work changed_at", "changed_at", work.changed_at],
+            ["work changed_at:", "changed_at", work.changed_at],
             [ts("Published:"), "published", localize(published_date)],
             [ts("Words:"), "words", number_with_delimiter(work.word_count)],
             [ts("Chapters:"), "chapters", chapter_total_display(work)]]

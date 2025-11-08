@@ -31,8 +31,10 @@
 <%= fields_for "work[chapter_attributes]", @chapter do |c| %>
   <%= c.hidden_field :content, :value => "#{@chapter.content}" %>
   <%= c.hidden_field :title, :value => "#{@chapter.title}" %>
-  <%= c.hidden_field :published_at, :value => "#{@chapter.published_at}" %>
+  <%= c.hidden_field :posted_at, :value => "#{@chapter.posted_at}" %>
 <% end %>
+<%= form.hidden_field :posted_at, value: "#{@work.posted_at}" %>
+<%= form.hidden_field :changed_at, value: "#{@work.changed_at}" %>
 <%= fields_for "work[series_attributes]" do |s| %>
   <%= s.hidden_field :id, value: "#{work_series_value(:id)}" %>
   <%= s.hidden_field :title, value: "#{work_series_value(:title)}" %>

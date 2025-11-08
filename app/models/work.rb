@@ -130,15 +130,12 @@ class Work < ApplicationRecord
     end
   end
 
-  def validate_published_at
-    return unless first_chapter
+  def validate_posted_at
+    validate_date(:posted_at)
+  end
 
-    if !self.first_chapter.published_at
-      self.first_chapter.published_at = Date.current
-    elsif self.first_chapter.published_at > Date.current
-      errors.add(:base, ts("Publication date can't be in the future."))
-      throw :abort
-    end
+  def validate_changed_at
+    validate_date(:changed_at)
   end
 
   validates :fandom_string,
@@ -228,7 +225,9 @@ class Work < ApplicationRecord
   # consistency and that associated variables are updated.
   ########################################################################
 
-  before_save :clean_and_validate_title, :validate_published_at, :ensure_revised_at
+  before_save :clean_and_validate_title, :validate_posted_at, :validate_changed_at, :ensure_revised_at
+  before_save :set_dates_on_posted_change, if: Proc.new { |w| w.posted_changed? }
+  before_save :set_changed_at
 
   after_save :post_first_chapter
   before_save :set_word_count
@@ -247,7 +246,6 @@ class Work < ApplicationRecord
   after_destroy :expire_caches, :update_pseud_and_collection_indexes
   after_save :notify_recipients, :expire_caches, :update_pseud_and_collection_indexes, :update_tag_index, :touch_series, :touch_related_works
 
-  before_save :set_posted_at, :set_changed_at
 
   before_destroy :send_deleted_work_notification, prepend: true
   def send_deleted_work_notification
@@ -599,16 +597,18 @@ class Work < ApplicationRecord
   # VERSIONS & REVISION DATES
   ########################################################################
 
-  def set_posted_at
-    return unless posted_changed?
-
+  def set_dates_on_posted_change
     self.posted_at = Time.current
-    self.first_chapter.set_posted_at # to be tested
+    self.first_chapter.posted_at = Time.current
+    self.changed_at = Time.current
+  end
+
+  def set_posted_at(date=nil)
+    self.posted_at = date || Time.current
   end
 
   def set_changed_at(date=nil)
     return unless date ||
-      posted_changed? ||
       in_unrevealed_collection_changed?
 
     self.changed_at = date || Time.current
@@ -678,11 +678,6 @@ class Work < ApplicationRecord
     end
   end
 
-  def default_date
-    backdate = first_chapter.try(:published_at) if self.backdate
-    backdate || Date.current
-  end
-
   ########################################################################
   # SERIES
   ########################################################################
@@ -734,7 +729,6 @@ class Work < ApplicationRecord
     return unless self.saved_change_to_posted? && self.posted
     return if chapter_one&.posted
 
-    chapter_one.published_at = Date.current unless self.backdate
     chapter_one.posted = true
     chapter_one.save
   end
@@ -793,7 +787,7 @@ class Work < ApplicationRecord
     # only posted chapters unless specified
     chapters = chapters.where(posted: true) unless include_drafts
     # when doing navigation pass false as contents are not needed
-    chapters = chapters.select('published_at, id, work_id, title, position, posted') unless include_content
+    chapters = chapters.select('posted_at, id, work_id, title, position, posted') unless include_content
     chapters
   end
 
@@ -1309,5 +1303,23 @@ class Work < ApplicationRecord
         .reject { |c| c.request_prompt.anonymous? }
         .map(&:requesting_pseud)
         .include?(gift.pseud)
+  end
+
+  def validate_date(attr)
+    date = read_attribute(attr)
+    date_was = attribute_in_database(attr)
+    return unless date
+
+    # Undo date change if only time was changed
+    write_attribute(attr, date_was) if date_was && same_date?(date, date_was)
+
+    return unless date > Time.current
+
+    errors.add(:base, ts("Publication date can't be in the future."))
+    throw :abort
+  end
+
+  def same_date?(date1, date2)
+    return date1.to_date == date2.to_date
   end
 end

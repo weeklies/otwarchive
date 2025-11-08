@@ -43,7 +43,16 @@ class Chapter < ApplicationRecord
 
   before_save :strip_title
   before_save :set_word_count
-  before_save :validate_published_at
+  before_save :validate_posted_at
+  before_save :set_dates_on_posted_change
+
+  def set_dates_on_posted_change
+    return unless self.posted_changed?
+
+    self.posted_at ||= Time.current
+    work.changed_at = Time.current
+  end
+
 
   after_create :notify_after_creation
   after_update :notify_after_update
@@ -77,18 +86,10 @@ class Chapter < ApplicationRecord
     end
   end
 
-  after_save :set_posted_at, :set_work_changed_at, :invalidate_chapter_count,
+  after_save :invalidate_chapter_count,
     if: Proc.new { |chapter| chapter.saved_change_to_posted? }
 
-  def set_posted_at
-    self.posted_at = Time.current
-  end
-
-  def set_work_changed_at
-    work&.set_changed_at(Time.current)
-  end
-
-  before_destroy :fix_positions_before_destroy, :invalidate_chapter_count, :set_work_changed_at
+  before_destroy :fix_positions_before_destroy, :invalidate_chapter_count
   def fix_positions_before_destroy
     if work&.persisted? && position
       chapters = work.chapters.where(["position > ?", position])
@@ -180,14 +181,20 @@ class Chapter < ApplicationRecord
     self.wip_length_placeholder = number
   end
 
-  # Checks the chapter published_at date isn't in the future
-  def validate_published_at
-    if !self.published_at
-      self.published_at = Date.current
-    elsif self.published_at > Date.current
-      errors.add(:base, ts("Publication date can't be in the future."))
-      throw :abort
+  def validate_posted_at
+    self.published_at = Date.current
+    return unless self.posted_at
+
+    # Do not change posted_at if only time was changed
+    if self.posted_at_was && self.posted_at.to_date == self.posted_at_was.to_date
+      self.posted_at = self.posted_at_was
     end
+
+    # Checks the chapter posted_at date isn't in the future
+    return unless self.posted_at > Time.current
+
+    errors.add(:base, ts("Chapter publication date can't be in the future."))
+    throw :abort
   end
 
   # Set the value of word_count to reflect the length of the text in the chapter content

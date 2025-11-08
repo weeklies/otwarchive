@@ -878,7 +878,10 @@ class WorksController < ApplicationController
       :rating_string, :fandom_string, :relationship_string, :character_string,
       :archive_warning_string, :category_string,
       :freeform_string, :summary, :notes, :endnotes, :collection_names, :recipients, :wip_length,
-      :backdate, :language_id, :work_skin_id, :restricted, :comment_permissions,
+      :backdate,
+      :posted_at, :"posted_at(3i)", :"posted_at(2i)", :"posted_at(1i)",
+      :changed_at, :"changed_at(3i)", :"changed_at(2i)", :"changed_at(1i)",
+      :language_id, :work_skin_id, :restricted, :comment_permissions,
       :moderated_commenting_enabled, :title, :pseuds_to_add, :collections_to_add,
       current_user_pseud_ids: [],
       collections_to_remove: [],
@@ -892,8 +895,8 @@ class WorksController < ApplicationController
         :url, :title, :author, :language_id, :translation
       ],
       chapter_attributes: [
-        :title, :"published_at(3i)", :"published_at(2i)", :"published_at(1i)",
-        :published_at, :content
+        :title, :"posted_at(3i)", :"posted_at(2i)", :"posted_at(1i)",
+        :posted_at, :content
       ]
     )
   end

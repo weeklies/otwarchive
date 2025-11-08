@@ -374,7 +374,7 @@ Feature: Create Works
       And it is currently Wed Apr 26 22:00:00 UTC 2017
       And I set up a draft "Futuristic"
     When I check "Set a different publication date"
-      And I select "30" from "work[chapter_attributes][published_at(3i)]"
+      And I select "30" from "work[posted_at(3i)]"
       And I press "Post"
     Then I should see "Publication date can't be in the future."
     When I jump in our Delorean and return to the present

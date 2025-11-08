@@ -525,9 +525,9 @@ Feature: Edit chapters
       And it is currently Wed Apr 26 22:00:00 UTC 2017
       And I post the work "Futuristic"
       And a chapter is set up for "Futuristic"
-    When I select "30" from "chapter[published_at(3i)]"
+    When I select "30" from "chapter[posted_at(3i)]"
       And I press "Post"
-    Then I should see "Publication date can't be in the future."
+    Then I should see "Chapter publication date can't be in the future."
     When I jump in our Delorean and return to the present
 
 

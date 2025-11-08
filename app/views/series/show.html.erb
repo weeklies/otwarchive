@@ -42,9 +42,9 @@
     <% end %>
 
     <dt><%= ts("Series Begun:") %></dt>
-    <dd><%= @series.published_at.to_date %></dd>
+    <dd><%= @series.posted_at.to_date %></dd>
     <dt><%= ts("Series Updated:") %></dt>
-    <dd><%= @series.revised_at ? @series.revised_at.to_date : @series.published_at %></dd>
+    <dd><%= @series.changed_at ? @series.changed_at.to_date : @series.posted_at.to_date %></dd>
 
     <% unless @series.summary.blank? %>
       <dt><%= ts("Description:") %></dt>

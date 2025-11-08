@@ -204,20 +204,20 @@ class Series < ApplicationRecord
     self.work_tags.group_by { |t| t.type.to_s }
   end
 
-  # Grabs the earliest published_at date of the visible works in the series
-  def published_at
+  # Grabs the earliest posted_at date of the visible works in the series
+  def posted_at
     if self.works.visible.posted.blank?
       self.created_at
     else
-      Work.in_series(self).visible.collect(&:published_at).compact.uniq.sort.first
+      Work.in_series(self).visible.collect(&:posted_at).compact.uniq.sort.first
     end
   end
 
-  def revised_at
+  def changed_at
     if self.works.visible.posted.blank?
       self.updated_at
     else
-      Work.in_series(self).visible.collect(&:revised_at).compact.uniq.sort.last
+      Work.in_series(self).visible.collect(&:changed_at).compact.uniq.sort.last
     end
   end
 

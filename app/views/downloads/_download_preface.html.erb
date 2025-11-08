@@ -34,9 +34,9 @@
       <% end %>
       <dt><%= t(".stats") %></dt>
       <dd>
-        <%= t(".published", date: l(@work.first_chapter.published_at)) %>
-        <% if @work.first_chapter.published_at < @work.revised_at.to_date %>
-          <%= @work.is_wip ? t(".updated", date: l(@work.revised_at.to_date)) : t(".completed", date: l(@work.revised_at.to_date)) %>
+        <%= t(".published", date: l(@work.posted_at)) %>
+        <% if @work.posted_at < @work.changed_at.to_date %>
+          <%= @work.is_wip ? t(".updated", date: l(@work.changed_at.to_date)) : t(".completed", date: l(@work.changed_at.to_date)) %>
         <% end %>
         <%= t(".words", count_with_delimiters: number_with_delimiter(@work.word_count)) %>
         <%= t(".chapters", chapter_total_display: chapter_total_display(@work)) %>

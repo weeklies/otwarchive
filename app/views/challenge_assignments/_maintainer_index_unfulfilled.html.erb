@@ -17,15 +17,15 @@
       <% if @collection.moderated? %>
         <% # we might have works posted that haven't yet been approved %>
         <% if assignment.posted? %>
-          <%= link_to ts("Gift posted on %{published_at}", :published_at => assignment.creation.published_at), assignment.creation %>
+          <%= link_to ts("Gift posted on %{posted_at}", posted_at: assignment.creation.posted_at), assignment.creation %>
           <% if assignment.creation.respond_to?(:word_count) %>
             <%= ts("(%{count} words)", :count => assignment.creation.word_count) %>
-          <% end %>            
+          <% end %>
         <% else %>
           <%= ts("Not yet posted") %>
         <% end %>
       <% end %>
-    
+
       <ul class="actions">
         <% if assignment.posted? %>
           <li>
@@ -38,7 +38,7 @@
         <li>
           <%= label_tag "default_#{assignment.id}" do %>
             <%= ts("Default") %>
-            <%= check_box_tag "default_#{assignment.id}" %>              
+            <%= check_box_tag "default_#{assignment.id}" %>
           <% end %>
         </li>
       </ul>

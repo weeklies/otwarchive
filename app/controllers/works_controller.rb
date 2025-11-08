@@ -915,7 +915,7 @@ class WorksController < ApplicationController
       :query,
       :title,
       :creators,
-      :revised_at,
+      :changed_at,
       :complete,
       :single_chapter,
       :word_count,

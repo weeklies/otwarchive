@@ -39,8 +39,10 @@
     </dd>
 
     <% if assignment.creation %>
-      <dt><%= ts("Posted:") %></dt>
-      <dd class="datetime"><%= assignment.creation.published_at %></dd>
+      <% if assignment.creation.respond_to?(:posted_at) %>
+        <dt><%= ts("Posted:") %></dt>
+        <dd class="datetime"><%= l(assignment.creation.posted_at.to_date) %></dd>
+      <% end %>
 
       <% if assignment.creation.respond_to?(:word_count) %>
         <dt><%= ts("Words:") %></dt>

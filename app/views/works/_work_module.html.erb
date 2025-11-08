@@ -43,7 +43,7 @@
 
     <!--required tags-->
     <%= get_symbols_for(work, tag_groups) %>
-    <p class="datetime"><%= set_format_for_date(work.revised_at) %></p>
+    <p class="datetime"><%= set_format_for_date(work.changed_at) %></p>
   </div>
 
   <% if !work.posted? %>

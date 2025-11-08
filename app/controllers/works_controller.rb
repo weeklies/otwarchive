@@ -785,7 +785,6 @@ class WorksController < ApplicationController
   end
 
   def set_work_form_fields
-    @work.reset_published_at(@chapter)
     @series = current_user.series.distinct
     @serial_works = @work.serial_works
 

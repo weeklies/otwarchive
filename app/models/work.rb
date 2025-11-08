@@ -225,7 +225,7 @@ class Work < ApplicationRecord
   # consistency and that associated variables are updated.
   ########################################################################
 
-  before_save :clean_and_validate_title, :validate_posted_at, :validate_changed_at, :ensure_revised_at
+  before_save :clean_and_validate_title, :validate_posted_at, :validate_changed_at
   before_save :set_dates_on_posted_change, if: Proc.new { |w| w.posted_changed? }
   before_save :set_changed_at
 
@@ -614,68 +614,21 @@ class Work < ApplicationRecord
     self.changed_at = date || Time.current
   end
 
-  def set_revised_at(date=nil)
-    date ||= self.chapters.where(posted: true).maximum('published_at') ||
-             self.revised_at || self.created_at || Time.current
-
-    if date.instance_of?(Date)
-      # We need a time, not a Date. So if the date is today, set it to the
-      # current time; otherwise, set it to noon UTC (so that almost every
-      # single time zone will have the revised_at date match the published_at
-      # date, and those that don't will have revised_at follow published_at).
-      date = (date == Date.current) ? Time.current : date.to_time(:utc).noon
-    end
-
-    self.revised_at = date
-  end
-
   def set_revised_at_by_chapter(chapter)
     # Invalidate chapter count cache
     self.invalidate_work_chapter_count(self)
     return if self.posted? && !chapter.posted?
+    return if self.posted_changed?
 
-    unless self.posted_changed?
-      if chapter.posted_changed?
-        self.major_version = self.major_version + 1
-      else
-        self.minor_version = self.minor_version + 1
-      end
-    end
-
-    if (self.new_record? || chapter.posted_changed?) && chapter.published_at == Date.current
-      self.set_revised_at(Time.current) # a new chapter is being posted, so most recent update is now
+    if chapter.posted_changed?
+      self.major_version = self.major_version + 1
     else
-      # Calculate the most recent chapter publication date:
-      max_date = self.chapters.where('id != ? AND posted = 1', chapter.id).maximum('published_at')
-      max_date = max_date.nil? ? chapter.published_at : [max_date, chapter.published_at].max
-
-      # Update revised_at to match the chapter publication date unless the
-      # dates already match:
-      set_revised_at(max_date) unless revised_at && revised_at.to_date == max_date
+      self.minor_version = self.minor_version + 1
     end
-  end
-
-  # Just to catch any cases that haven't gone through set_revised_at
-  def ensure_revised_at
-    self.set_revised_at if self.revised_at.nil?
   end
 
   def published_at
     self.first_chapter.published_at
-  end
-
-  # ensure published_at date is correct: reset its value for non-backdated works
-  # "chapter" arg should be the unsaved session instance of the work's first chapter
-  def reset_published_at(chapter)
-    if !self.backdate
-      if self.backdate_changed? # work was backdated but now it's not
-        # so reset its date to our best guess at its original pub date:
-        chapter.published_at = self.created_at.to_date
-      else # pub date may have changed without user's explicitly setting backdate option
-        # so reset it to the previous value:
-        chapter.published_at = chapter.published_at_was || Date.current
-      end
-    end
   end
 
   ########################################################################

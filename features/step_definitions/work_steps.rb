@@ -556,13 +556,16 @@ end
 When /^I set the publication date to (\d+) (.*) (\d+)$/ do |day, month, year|
   if page.has_selector?("#backdate-options-show")
     check("backdate-options-show") if page.find("#backdate-options-show")
-    select(day.to_s, from: "work[chapter_attributes][published_at(3i)]")
-    select(month, from: "work[chapter_attributes][published_at(2i)]")
-    select(year.to_s, from: "work[chapter_attributes][published_at(1i)]")
+    select(day.to_s, from: "work[posted_at(3i)]")
+    select(month, from: "work[posted_at(2i)]")
+    select(year.to_s, from: "work[posted_at(1i)]")
+    select(day.to_s, from: "work[chapter_attributes][posted_at(3i)]")
+    select(month, from: "work[chapter_attributes][posted_at(2i)]")
+    select(year.to_s, from: "work[chapter_attributes][posted_at(1i)]")
   else
-    select(day.to_s, from: "chapter[published_at(3i)]")
-    select(month, from: "chapter[published_at(2i)]")
-    select(year.to_s, from: "chapter[published_at(1i)]")
+    select(day.to_s, from: "chapter[posted_at(3i)]")
+    select(month, from: "chapter[posted_at(2i)]")
+    select(year.to_s, from: "chapter[posted_at(1i)]")
   end
 end
 

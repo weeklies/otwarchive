@@ -20,7 +20,7 @@ describe WorksController, work_search: true do
     suspended_user.update!(suspended: true, suspended_until: 1.week.from_now)
     work
   end
-  
+
   describe "before_action #clean_work_search_params" do
     let(:params) { {} }
 
@@ -586,31 +586,31 @@ describe WorksController, work_search: true do
       expect(update_work.user_has_creator_invite?(no_co_creator)).to be_falsey
     end
 
-    context "when the work has broken dates" do
+    context "when redating to the past" do
       let(:update_work) { create(:work, authors: [update_user.default_pseud]) }
       let(:update_chapter) { update_work.first_chapter }
 
       let(:attributes) do
         {
-          backdate: "1",
+          posted_at: "2021-09-01",
+          changed_at: "2021-09-03",
           chapter_attributes: {
-            published_at: "2021-09-01"
+            posted_at: "2021-09-02"
           }
         }
       end
 
       before do
-        # Work where chapter published_at did not override revised_at, times
-        # taken from AO3-5392
-        update_work.update_column(:revised_at, Time.new(2018, 4, 22, 23, 51, 42, "+04:00"))
-        update_chapter.update_column(:published_at, Date.new(2015, 7, 23))
+        update_work.update_column(:changed_at, Time.new(2018, 4, 22, 23, 51, 42, "+04:00"))
+        update_chapter.update_column(:posted_at, Date.new(2015, 7, 23))
       end
 
-      it "can be backdated" do
+      it "dates can be changed" do
         put :update, params: { id: update_work.id, work: attributes }
 
-        expect(update_chapter.reload.published_at).to eq(Date.new(2021, 9, 1))
-        expect(update_work.reload.revised_at).to eq(Time.utc(2021, 9, 1, 12)) # noon UTC
+        expect(update_chapter.reload.posted_at).to eq(Date.new(2021, 9, 2))
+        expect(update_work.reload.posted_at).to eq(Time.utc(2021, 9, 1))
+        expect(update_work.reload.changed_at).to eq(Time.utc(2021, 9, 3))
       end
     end
 
@@ -626,9 +626,10 @@ describe WorksController, work_search: true do
 
       let(:attributes) do
         {
-          backdate: "1",
+          posted_at: "2021-12-05",
+          changed_at: "2021-12-05",
           chapter_attributes: {
-            published_at: "2021-12-05"
+            posted_at: "2021-12-05"
           }
         }
       end
@@ -651,7 +652,7 @@ describe WorksController, work_search: true do
         it "prevents setting the publication date to the future" do
           expect(response).to render_template :edit
           expect(assigns[:work].errors.full_messages).to \
-            include("Publication date can't be in the future.")
+            include("Chapter publication date can't be in the future.")
         end
       end
 
@@ -659,9 +660,11 @@ describe WorksController, work_search: true do
         # December 5, 6 AM Europe/Samara -- before noon, but after midnight in both time zones
         let(:redate_time) { Time.new(2021, 12, 5, 6, 0, 0, "+04:00") }
 
-        it "doesn't set revised_at to the future" do
+        it "doesn't set dates to the future" do
           update_work.reload
-          expect(update_work.revised_at).to be <= Time.current
+          expect(update_work.changed_at).to be <= Time.current
+          expect(update_work.posted_at).to be <= Time.current
+          expect(update_work.first_chapter.posted_at).to be <= Time.current
         end
       end
     end
@@ -915,7 +918,7 @@ describe WorksController, work_search: true do
       it "errors and redirects to user page" do
         fake_login_known_user(suspended_user)
         delete :destroy, params: { id: suspended_users_work.id }
-        
+
         it_redirects_to_simple(user_path(suspended_user))
         expect(flash[:error]).to include("Your account has been suspended")
       end

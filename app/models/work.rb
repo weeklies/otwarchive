@@ -1015,11 +1015,11 @@ class Work < ApplicationRecord
   scope :ordered_by_word_count_asc, -> { order("word_count ASC") }
   scope :ordered_by_hit_count_desc, -> { order("hit_count DESC") }
   scope :ordered_by_hit_count_asc, -> { order("hit_count ASC") }
-  scope :ordered_by_date_desc, -> { order("revised_at DESC") }
-  scope :ordered_by_date_asc, -> { order("revised_at ASC") }
+  scope :ordered_by_date_desc, -> { order("changed_at DESC") }
+  scope :ordered_by_date_asc, -> { order("changed_at ASC") }
 
-  scope :recent, lambda { |*args| where("revised_at > ?", (args.first || 4.weeks.ago.to_date)) }
-  scope :within_date_range, lambda { |*args| where("revised_at BETWEEN ? AND ?", (args.first || 4.weeks.ago), (args.last || Time.now)) }
+  scope :recent, lambda { |*args| where("changed_at > ?", (args.first || 4.weeks.ago.to_date)) }
+  scope :within_date_range, lambda { |*args| where("changed_at BETWEEN ? AND ?", (args.first || 4.weeks.ago), (args.last || Time.now)) }
   scope :posted, -> { where(posted: true) }
   scope :unposted, -> { where(posted: false) }
   scope :not_spam, -> { where(spam: false) }
@@ -1040,7 +1040,7 @@ class Work < ApplicationRecord
   scope :revealed, -> { where(in_unrevealed_collection: false) }
   scope :latest, -> { visible_to_all.
                       revealed.
-                      order("revised_at DESC").
+                      order("changed_at DESC").
                       limit(ArchiveConfig.ITEMS_PER_PAGE) }
 
   # a complicated dynamic scope here:
@@ -1078,7 +1078,7 @@ class Work < ApplicationRecord
   scope :with_columns_for_blurb, lambda {
     select(:id, :created_at, :updated_at, :expected_number_of_chapters,
            :posted, :language_id, :restricted, :title, :summary, :word_count,
-           :hidden_by_admin, :revised_at, :complete, :in_anon_collection,
+           :hidden_by_admin, :changed_at, :complete, :in_anon_collection,
            :in_unrevealed_collection, :summary_sanitizer_version)
   }
 
@@ -1211,7 +1211,7 @@ class Work < ApplicationRecord
       root: false,
       only: [
         :title, :summary, :hidden_by_admin, :restricted, :posted,
-        :created_at, :revised_at, :word_count, :complete
+        :posted_at, :changed_at, :word_count, :complete
       ],
       methods: [
         :tag, :filter_ids, :rating_ids, :archive_warning_ids, :category_ids,

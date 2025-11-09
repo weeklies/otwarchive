@@ -91,7 +91,7 @@ class CollectionsController < ApplicationController
       # show recent
       @works = WorkQuery.new(
         collection_ids: [@collection.id], show_restricted: is_registered_user?,
-        sort_column: "revised_at",
+        sort_column: "changed_at",
         per_page: ArchiveConfig.NUMBER_OF_ITEMS_VISIBLE_IN_DASHBOARD
       ).search_results
 

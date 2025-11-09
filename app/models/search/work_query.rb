@@ -106,7 +106,7 @@ class WorkQuery < Query
 
   def range_filters
     ranges = []
-    [:word_count, :hits, :kudos_count, :comments_count, :bookmarks_count, :revised_at].each do |countable|
+    [:word_count, :hits, :kudos_count, :comments_count, :bookmarks_count, :changed_at].each do |countable|
       if options[countable].present?
         ranges << { range: { countable => SearchRange.parsed(options[countable]) } }
       end
@@ -223,7 +223,7 @@ class WorkQuery < Query
       range = {}
       range[:gte] = clamp_search_date(options[:date_from].to_date) if options[:date_from].present?
       range[:lte] = clamp_search_date(options[:date_to].to_date) if options[:date_to].present?
-      { range: { revised_at: range } }
+      { range: { changed_at: range } }
     rescue ArgumentError
       nil
     end
@@ -278,7 +278,7 @@ class WorkQuery < Query
     direction = options[:sort_direction].present? ? options[:sort_direction] : 'desc'
     sort_hash = { column => { order: direction } }
 
-    if column == 'revised_at'
+    if column == 'changed_at'
       sort_hash[column][:unmapped_type] = 'date'
     end
 
@@ -287,7 +287,7 @@ class WorkQuery < Query
 
   # When searching outside of filters, use relevance instead of date
   def default_sort
-    facet_tags? || collected? ? 'revised_at' : '_score'
+    facet_tags? || collected? ? 'changed_at' : '_score'
   end
 
   def aggregations

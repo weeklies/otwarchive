@@ -99,13 +99,13 @@ class BookmarkableQuery < Query
   # SORTING AND AGGREGATIONS
   ####################
 
-  # When sorting by bookmarkable date, we use the revised_at field to order the
+  # When sorting by bookmarkable date, we use the changed_at field to order the
   # results. When sorting by created_at, we use _score to sort (because the
   # only way to sort by a child's fields is to store the value in the _score
   # field and sort by score).
   def sort
     if sort_column == "bookmarkable_date"
-      sort_hash = { revised_at: { order: sort_direction, unmapped_type: "date" } }
+      sort_hash = { changed_at: { order: sort_direction, unmapped_type: "date" } }
     else
       sort_hash = { _score: { order: sort_direction } }
     end
@@ -215,7 +215,7 @@ class BookmarkableQuery < Query
   # updated).
   def date_filter
     if options[:bookmarkable_date].present?
-      { range: { revised_at: SearchRange.parsed(options[:bookmarkable_date]) } }
+      { range: { changed_at: SearchRange.parsed(options[:bookmarkable_date]) } }
     end
   end
 

@@ -99,7 +99,7 @@ class WorkSearchForm
   end
 
   def clean_up_angle_brackets
-    [:word_count, :hits, :kudos_count, :comments_count, :bookmarks_count, :revised_at, :query].each do |countable|
+    [:word_count, :hits, :kudos_count, :comments_count, :bookmarks_count, :changed_at, :query].each do |countable|
       next unless @options[countable].present?
       str = @options[countable]
       @options[countable] = str.gsub("&gt;", ">").gsub("&lt;", "<")
@@ -154,7 +154,7 @@ class WorkSearchForm
         summary << "Language: <span lang=#{language.short}>#{language.name}</span>"
       end
     end
-    [:word_count, :hits, :kudos_count, :comments_count, :bookmarks_count, :revised_at].each do |countable|
+    [:word_count, :hits, :kudos_count, :comments_count, :bookmarks_count, :changed_at].each do |countable|
       if @options[countable].present?
         summary << "#{countable.to_s.humanize.downcase}: #{@options[countable]}"
       end
@@ -185,7 +185,7 @@ class WorkSearchForm
     %w[Creator authors_to_sort_on],
     %w[Title title_to_sort_on],
     ["Date Posted", "created_at"],
-    ["Date Updated", "revised_at"],
+    ["Date Updated", "changed_at"],
     ["Word Count", "word_count"],
     %w[Hits hits],
     %w[Kudos kudos_count],
@@ -215,7 +215,7 @@ class WorkSearchForm
   end
 
   def default_sort_column
-    options[:faceted] || options[:collected] ? 'revised_at' : '_score'
+    options[:faceted] || options[:collected] ? 'changed_at' : '_score'
   end
 
   def default_sort_direction

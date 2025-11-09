@@ -8,7 +8,7 @@ class QueryCleaner
     %w[Creator authors_to_sort_on],
     %w[Title title_to_sort_on],
     ['Date Posted', 'created_at'],
-    ['Date Updated', 'revised_at'],
+    ['Date Updated', 'changed_at'],
     ['Word Count', 'word_count'],
     %w[Hits hits],
     %w[Kudos kudos_count],

@@ -357,9 +357,9 @@ def get_work_name(age, classname, name)
   klass = classname.classify.constantize
   owner = (classname == "user") ? klass.find_by(login: name) : klass.find_by(name: name)
   if age == "most recent"
-    owner.works.order("revised_at DESC").first.title
+    owner.works.order("changed_at DESC").first.title
   elsif age == "oldest"
-    owner.works.order("revised_at DESC").last.title
+    owner.works.order("changed_at DESC").last.title
   end
 end
 

@@ -26,7 +26,7 @@ Feature: Search works by work info
     When I am on the search works page
       And I fill in "Date" with "> 2 years ago"
       And I press "Search" within "#new_work_search"
-    Then I should see "You searched for: revised at: > 2 years ago"
+    Then I should see "You searched for: changed at: > 2 years ago"
       And I should see "2 Found"
       And I should see "My <strong>er German Work"
       And I should see "unfinished"
@@ -35,7 +35,7 @@ Feature: Search works by work info
       And the field labeled "Date" should contain "> 2 years ago"
     When I fill in "Word Count" with ">15000"
       And I press "Search" within "#new_work_search"
-    Then I should see "You searched for: word count: >15000 revised at: > 2 years ago"
+    Then I should see "You searched for: word count: >15000 changed at: > 2 years ago"
       And I should see "No results found"
 
   Scenario: Search with the header search field and then refine by creator

@@ -232,19 +232,19 @@
             <dl>
               <dt><%= label_tag "posted_at", ts("Work publication date") %></dt>
               <dd id="managePublicationDate" class="datetime" title="<%= ts("set date") %>">
-                <%= f.date_select :posted_at, start_year: Date.current.year, end_year: 1950, include_blank: true, value: @work.posted_at, order: [:day, :month, :year] %>
+                <%= f.date_select :posted_at, start_year: Date.current.year, end_year: 1950, default: Time.current, value: @work.posted_at, order: [:day, :month, :year] %>
               </dd>
             </dl>
             <dl>
               <dt><%= label_tag "changed_at", ts("Work changed date") %></dt>
               <dd id="TODO-managePublicationDate" class="datetime" title="<%= ts("set date") %>">
-                <%= f.date_select :changed_at, start_year: Date.current.year, end_year: 1950, include_blank: true, value: @work.changed_at, order: [:day, :month, :year] %>
+                <%= f.date_select :changed_at, start_year: Date.current.year, end_year: 1950, default: Time.current, value: @work.changed_at, order: [:day, :month, :year] %>
               </dd>
             </dl>
             <dl>
               <dt><%= label_tag "posted_at", ts("Chapter publication date") %></dt>
               <dd id="managePublicationDate" class="datetime" title="<%= ts("set date") %>">
-                <%= c.date_select :posted_at, start_year: Date.current.year, end_year: 1950, include_blank: true, value: @chapter.posted_at, order: [:day, :month, :year] %>
+                <%= c.date_select :posted_at, start_year: Date.current.year, end_year: 1950, default: Time.current, value: @chapter.posted_at, order: [:day, :month, :year] %>
               </dd>
             </dl>
           </fieldset>

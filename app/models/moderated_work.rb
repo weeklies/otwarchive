@@ -2,7 +2,7 @@ class ModeratedWork < ApplicationRecord
   belongs_to :work
   validates :work_id, uniqueness: true
 
-  delegate :title, :revised_at, to: :work
+  delegate :title, :changed_at, to: :work
 
   def self.register(work)
     find_or_create_by(work_id: work.id)
@@ -51,7 +51,7 @@ class ModeratedWork < ApplicationRecord
     where(id: ids).update_all("approved = 1")
     Work.joins(:moderated_work).where("moderated_works.id IN (?)", ids).each do |work|
       work.mark_as_ham!
-    end    
+    end
   end
 
   def mark_reviewed!

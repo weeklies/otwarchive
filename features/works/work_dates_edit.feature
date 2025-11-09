@@ -5,7 +5,7 @@ Feature: Edit Works Dates
   I want to edit existing works
 
   Scenario: Editing dates on a work
-   Given I have loaded the fixtures
+   Given the work "First work" by "testuser" with fandom "first fandom"
      And I am logged in as "testuser" with password "testuser"
      And all indexing jobs have been run
    When I am on testuser's works page
@@ -78,7 +78,7 @@ Feature: Edit Works Dates
       And I am logged in as a random user
       And I post the work "Beauty and the Beast 2077"
     When I edit the work "Beauty and the Beast 2077"
-      And I check "Set a different publication date"
+      And I check "Set different publication dates"
       And I select "December" from "work_posted_at_2i"
       And I press "Update"
     Then I should see "Sorry! We couldn't save this work because: Publication date can't be in the future."

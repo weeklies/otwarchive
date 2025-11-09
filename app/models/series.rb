@@ -233,7 +233,7 @@ class Series < ApplicationRecord
         :complete
       ],
       methods: [
-        :revised_at, :posted, :tag, :filter_ids, :rating_ids,
+        :changed_at, :posted, :tag, :filter_ids, :rating_ids,
         :archive_warning_ids, :category_ids, :fandom_ids, :character_ids,
         :relationship_ids, :freeform_ids, :creators,
         :word_count, :work_types]
